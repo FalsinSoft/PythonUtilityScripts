@@ -10,3 +10,7 @@ Very basic script able to convert a file from a specific codec format to another
 KradfileToSQLite
 ---------
 Convert the [KRADFILE](http://www.edrdg.org/krad/kradinf.html) to sqlite database
+
+RadkfileToSQLite
+---------
+Convert the [RADKFILE](http://www.edrdg.org/krad/kradinf.html) to sqlite database
