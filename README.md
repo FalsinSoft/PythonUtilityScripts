@@ -14,3 +14,7 @@ Convert the [KRADFILE](http://www.edrdg.org/krad/kradinf.html) to sqlite databas
 RadkfileToSQLite
 ---------
 Convert the [RADKFILE](http://www.edrdg.org/krad/kradinf.html) to sqlite database
+
+JMdictToSQLite
+---------
+Convert the [JMDict](https://www.edrdg.org/jmdict/j_jmdict.html) to sqlite database
