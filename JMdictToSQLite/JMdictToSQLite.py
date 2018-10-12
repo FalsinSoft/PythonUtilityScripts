@@ -31,7 +31,7 @@ def create_database(name):
     c.execute("CREATE TABLE k_ele_ke_inf (k_ele_id INTEGER, ke_inf TEXT)")
     c.execute("CREATE TABLE k_ele_ke_pri (k_ele_id INTEGER, ke_pri TEXT)")
 
-    c.execute("CREATE TABLE r_ele (entry_id INTEGER, reb TEXT DEFAULT '', re_nokanji TEXT DEFAULT NULL)")
+    c.execute("CREATE TABLE r_ele (entry_id INTEGER, reb TEXT DEFAULT '', re_nokanji TEXT DEFAULT '')")
     c.execute("CREATE TABLE r_ele_re_restr (r_ele_id INTEGER, re_restr TEXT)")
     c.execute("CREATE TABLE r_ele_re_inf (r_ele_id INTEGER, re_inf TEXT)")
     c.execute("CREATE TABLE r_ele_re_pri (r_ele_id INTEGER, re_pri TEXT)")
@@ -99,8 +99,6 @@ def parse_r_ele(r_ele, entry_id, dtd, database):
         elif item.tag == "re_nokanji":
             if(item.text != None):
                 c.execute("UPDATE r_ele SET re_nokanji = ? WHERE rowid = ?", (item.text, r_ele_id))
-            else:
-                c.execute("UPDATE r_ele SET re_nokanji = '' WHERE rowid = ?", [r_ele_id])
         elif item.tag == "re_restr":
             c.execute("INSERT INTO r_ele_re_restr (r_ele_id, re_restr) VALUES (?, ?)", (r_ele_id, item.text))
         elif item.tag == "re_inf":

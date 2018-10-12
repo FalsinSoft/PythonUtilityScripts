@@ -1,0 +1,23 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.28010.2041
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "Kanjidic2ToSQLite", "Kanjidic2ToSQLite.pyproj", "{EEA19C3E-0AC2-435A-ACD5-5D057B406400}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{EEA19C3E-0AC2-435A-ACD5-5D057B406400}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EEA19C3E-0AC2-435A-ACD5-5D057B406400}.Release|Any CPU.ActiveCfg = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {98FB365D-1AE8-4963-9A55-09D826EEED39}
+	EndGlobalSection
+EndGlobal
