@@ -6,6 +6,34 @@ import sys
 import os
 import codecs
 
+# Comment xml elements you don't want to be imported into database (please
+# note, if you comment main elements like, for example, "k_ele", "r_ele" or 
+# "sense" all the child elements will not be imported as well)
+xml_elements = [
+    "k_ele",
+    "keb",
+    "ke_inf",
+    "ke_pri",
+    "r_ele",
+    "reb",
+    "re_nokanji",
+    "re_restr",
+    "re_inf",
+    "re_pri",
+    "sense",
+    "stagk",
+    "stagr",
+    "pos",
+    "xref",
+    "ant",
+    "field",
+    "misc",
+    "s_inf",
+    "dial",
+    "gloss"
+    ]
+
+
 def parse_cmdline():
     parser = ArgumentParser()
     parser.add_argument("--jmdictfile", help="path to the .xml JMdict file", default="JMdict_e")
@@ -27,49 +55,79 @@ def create_database(name):
 
     c.execute("CREATE TABLE entry (ent_seq INTEGER DEFAULT 0)")
 
-    c.execute("CREATE TABLE k_ele (entry_id INTEGER, keb TEXT DEFAULT '')")
-    c.execute("CREATE TABLE k_ele_ke_inf (k_ele_id INTEGER, ke_inf TEXT)")
-    c.execute("CREATE TABLE k_ele_ke_pri (k_ele_id INTEGER, ke_pri TEXT)")
+    if "k_ele" in xml_elements:
+        c.execute("CREATE TABLE k_ele (entry_id INTEGER, keb TEXT DEFAULT '')")
+        c.execute("CREATE INDEX id_k_ele_index ON k_ele (entry_id)")
+        c.execute("CREATE INDEX reb_k_ele_index ON k_ele (keb)")
 
-    c.execute("CREATE TABLE r_ele (entry_id INTEGER, reb TEXT DEFAULT '', re_nokanji TEXT DEFAULT '')")
-    c.execute("CREATE TABLE r_ele_re_restr (r_ele_id INTEGER, re_restr TEXT)")
-    c.execute("CREATE TABLE r_ele_re_inf (r_ele_id INTEGER, re_inf TEXT)")
-    c.execute("CREATE TABLE r_ele_re_pri (r_ele_id INTEGER, re_pri TEXT)")
+        if "ke_inf" in xml_elements:
+            c.execute("CREATE TABLE k_ele_ke_inf (k_ele_id INTEGER, ke_inf TEXT)")
+            c.execute("CREATE INDEX id_k_ele_ke_inf_index ON k_ele_ke_inf (k_ele_id)")
 
-    c.execute("CREATE TABLE sense (entry_id INTEGER)")
-    c.execute("CREATE TABLE sense_stagk (sense_id INTEGER, stagk TEXT)")
-    c.execute("CREATE TABLE sense_stagr (sense_id INTEGER, stagr TEXT)")
-    c.execute("CREATE TABLE sense_pos (sense_id INTEGER, pos TEXT)")
-    c.execute("CREATE TABLE sense_xref (sense_id INTEGER, xref TEXT)")
-    c.execute("CREATE TABLE sense_ant (sense_id INTEGER, ant TEXT)")
-    c.execute("CREATE TABLE sense_field (sense_id INTEGER, field TEXT)")
-    c.execute("CREATE TABLE sense_misc (sense_id INTEGER, misc TEXT)")
-    c.execute("CREATE TABLE sense_s_inf (sense_id INTEGER, s_inf TEXT)")
-    c.execute("CREATE TABLE sense_dial (sense_id INTEGER, dial TEXT)")
-    c.execute("CREATE TABLE sense_gloss (sense_id INTEGER, gloss TEXT)")
+        if "ke_pri" in xml_elements:
+            c.execute("CREATE TABLE k_ele_ke_pri (k_ele_id INTEGER, ke_pri TEXT)")
+            c.execute("CREATE INDEX id_k_ele_ke_pri_index ON k_ele_ke_pri (k_ele_id)")
 
-    c.execute("CREATE INDEX id_k_ele_index ON k_ele (entry_id)")
-    c.execute("CREATE INDEX reb_k_ele_index ON k_ele (keb)")
-    c.execute("CREATE INDEX id_k_ele_ke_inf_index ON k_ele_ke_inf (k_ele_id)")
-    c.execute("CREATE INDEX id_k_ele_ke_pri_index ON k_ele_ke_pri (k_ele_id)")
+    if "r_ele" in xml_elements:
+        c.execute("CREATE TABLE r_ele (entry_id INTEGER, reb TEXT DEFAULT '', re_nokanji TEXT DEFAULT '')")
+        c.execute("CREATE INDEX id_r_ele_index ON r_ele (entry_id)")
+        c.execute("CREATE INDEX reb_r_ele_index ON r_ele (reb)")
 
-    c.execute("CREATE INDEX id_r_ele_index ON r_ele (entry_id)")
-    c.execute("CREATE INDEX reb_r_ele_index ON r_ele (reb)")
-    c.execute("CREATE INDEX id_r_ele_re_restr_index ON r_ele_re_restr (r_ele_id)")
-    c.execute("CREATE INDEX id_r_ele_re_inf_index ON r_ele_re_inf (r_ele_id)")
-    c.execute("CREATE INDEX id_r_ele_re_pri_index ON r_ele_re_pri (r_ele_id)")
+        if "re_restr" in xml_elements:
+            c.execute("CREATE TABLE r_ele_re_restr (r_ele_id INTEGER, re_restr TEXT)")
+            c.execute("CREATE INDEX id_r_ele_re_restr_index ON r_ele_re_restr (r_ele_id)")
 
-    c.execute("CREATE INDEX id_sense_index ON sense (entry_id)")
-    c.execute("CREATE INDEX id_sense_stagk_index ON sense_stagk (sense_id)")
-    c.execute("CREATE INDEX id_sense_stagr_index ON sense_stagr (sense_id)")
-    c.execute("CREATE INDEX id_sense_pos_index ON sense_pos (sense_id)")
-    c.execute("CREATE INDEX id_sense_xref_index ON sense_xref (sense_id)")
-    c.execute("CREATE INDEX id_sense_ant_index ON sense_ant (sense_id)")
-    c.execute("CREATE INDEX id_sense_field_index ON sense_field (sense_id)")
-    c.execute("CREATE INDEX id_sense_misc_index ON sense_misc (sense_id)")
-    c.execute("CREATE INDEX id_sense_s_inf_index ON sense_s_inf (sense_id)")
-    c.execute("CREATE INDEX id_sense_dial_index ON sense_dial (sense_id)")
-    c.execute("CREATE INDEX id_sense_gloss_index ON sense_gloss (sense_id)")
+        if "re_inf" in xml_elements:
+            c.execute("CREATE TABLE r_ele_re_inf (r_ele_id INTEGER, re_inf TEXT)")
+            c.execute("CREATE INDEX id_r_ele_re_inf_index ON r_ele_re_inf (r_ele_id)")
+
+        if "re_pri" in xml_elements:
+            c.execute("CREATE TABLE r_ele_re_pri (r_ele_id INTEGER, re_pri TEXT)")
+            c.execute("CREATE INDEX id_r_ele_re_pri_index ON r_ele_re_pri (r_ele_id)")
+
+    if "sense" in xml_elements:
+        c.execute("CREATE TABLE sense (entry_id INTEGER)")
+        c.execute("CREATE INDEX id_sense_index ON sense (entry_id)")
+
+        if "stagk" in xml_elements:
+            c.execute("CREATE TABLE sense_stagk (sense_id INTEGER, stagk TEXT)")
+            c.execute("CREATE INDEX id_sense_stagk_index ON sense_stagk (sense_id)")
+
+        if "stagr" in xml_elements:
+            c.execute("CREATE TABLE sense_stagr (sense_id INTEGER, stagr TEXT)")
+            c.execute("CREATE INDEX id_sense_stagr_index ON sense_stagr (sense_id)")
+
+        if "pos" in xml_elements:
+            c.execute("CREATE TABLE sense_pos (sense_id INTEGER, pos TEXT)")
+            c.execute("CREATE INDEX id_sense_pos_index ON sense_pos (sense_id)")
+
+        if "xref" in xml_elements:
+            c.execute("CREATE TABLE sense_xref (sense_id INTEGER, xref TEXT)")
+            c.execute("CREATE INDEX id_sense_xref_index ON sense_xref (sense_id)")
+
+        if "ant" in xml_elements:
+            c.execute("CREATE TABLE sense_ant (sense_id INTEGER, ant TEXT)")
+            c.execute("CREATE INDEX id_sense_ant_index ON sense_ant (sense_id)")
+
+        if "field" in xml_elements:
+            c.execute("CREATE TABLE sense_field (sense_id INTEGER, field TEXT)")
+            c.execute("CREATE INDEX id_sense_field_index ON sense_field (sense_id)")
+
+        if "misc" in xml_elements:
+            c.execute("CREATE TABLE sense_misc (sense_id INTEGER, misc TEXT)")
+            c.execute("CREATE INDEX id_sense_misc_index ON sense_misc (sense_id)")
+
+        if "s_inf" in xml_elements:
+            c.execute("CREATE TABLE sense_s_inf (sense_id INTEGER, s_inf TEXT)")
+            c.execute("CREATE INDEX id_sense_s_inf_index ON sense_s_inf (sense_id)")
+
+        if "dial" in xml_elements:
+            c.execute("CREATE TABLE sense_dial (sense_id INTEGER, dial TEXT)")
+            c.execute("CREATE INDEX id_sense_dial_index ON sense_dial (sense_id)")
+
+        if "gloss" in xml_elements:
+            c.execute("CREATE TABLE sense_gloss (sense_id INTEGER, gloss TEXT)")
+            c.execute("CREATE INDEX id_sense_gloss_index ON sense_gloss (sense_id)")
 
     return database
 
@@ -80,6 +138,8 @@ def parse_k_ele(k_ele, entry_id, dtd, database):
     k_ele_id = c.lastrowid
 
     for item in k_ele:
+        if item.tag not in xml_elements:
+            continue
         if item.tag == "keb":
             c.execute("UPDATE k_ele SET keb = ? WHERE rowid = ?", (item.text, k_ele_id))
         elif item.tag == "ke_inf":
@@ -94,6 +154,8 @@ def parse_r_ele(r_ele, entry_id, dtd, database):
     r_ele_id = c.lastrowid
 
     for item in r_ele:
+        if item.tag not in xml_elements:
+            continue
         if item.tag == "reb":
             c.execute("UPDATE r_ele SET reb = ? WHERE rowid = ?", (item.text, r_ele_id))
         elif item.tag == "re_nokanji":
@@ -113,6 +175,8 @@ def parse_sense(sense, entry_id, dtd, database):
     sense_id = c.lastrowid
 
     for item in sense:
+        if item.tag not in xml_elements:
+            continue
         if item.tag == "stagk":
             c.execute("INSERT INTO sense_stagk (sense_id, stagk) VALUES (?, ?)", (sense_id, item.text))
         elif item.tag == "stagr":
@@ -141,6 +205,8 @@ def parse_entry(entry, dtd, database):
     entry_id = c.lastrowid
     
     for item in entry:
+        if item.tag not in xml_elements:
+            continue
         if item.tag == "ent_seq":
             c.execute("UPDATE entry SET ent_seq = ? WHERE rowid = ?", (item.text, entry_id))
         elif item.tag == "k_ele":
