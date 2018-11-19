@@ -26,3 +26,7 @@ Convert the [KANJIDIC2](http://www.edrdg.org/wiki/index.php/KANJIDIC_Project) to
 JMnedictToSQLite
 ---------
 Convert the [JMnedict](https://www.edrdg.org/enamdict/enamdict_doc.html) to sqlite database
+
+KanjiVGToSQLite
+---------
+Convert the [KanjiVG](https://kanjivg.tagaini.net/) to sqlite database
