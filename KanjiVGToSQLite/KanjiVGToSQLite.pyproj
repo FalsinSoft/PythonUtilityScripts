@@ -12,7 +12,7 @@
     <Name>KanjiVGToSQLite</Name>
     <RootNamespace>KanjiVGToSQLite</RootNamespace>
     <LaunchProvider>Standard Python launcher</LaunchProvider>
-    <CommandLineArguments>--sqlitefile=kanjisv.db</CommandLineArguments>
+    <CommandLineArguments>--sqlitefile=kanjivg.db</CommandLineArguments>
     <EnableNativeCodeDebugging>False</EnableNativeCodeDebugging>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
