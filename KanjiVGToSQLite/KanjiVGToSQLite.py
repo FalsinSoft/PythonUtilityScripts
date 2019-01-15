@@ -28,30 +28,45 @@ radical_id_list = {
 		"tradit" : 2
 	}
 
+dbtable = dict()
+
 def parse_cmdline():
     parser = ArgumentParser()
     parser.add_argument("--kanjivgfile", help="path to the .xml KanjiVG file", default="kanjivg.xml")
     parser.add_argument("--sqlitefile", help="path to the sqlite database to create", required=True)
+    parser.add_argument("--dbtableprefix", help="prefix of db tables (ex. kanjivg)", default="kanjivg")
+    parser.add_argument("--appendtables", help="append tables into an existing database file")
     return parser.parse_args()
 
 
-def create_database(name):
+def create_database(name, prefix, append):
     sqlitefile = name
+    global dbtable
+
+    if(prefix != ""):
+        prefix += "_"
+
+    dbtable["kanji"] = prefix + "kanji"
+    dbtable["groups"] = prefix + "groups"
+    dbtable["strokes"] = prefix + "strokes"
 
     if len(sqlitefile) < 3 or sqlitefile[-3:] != ".db":
         sqlitefile = sqlitefile + ".db"
 
-    if os.path.exists(sqlitefile):
+    if append == False and os.path.exists(sqlitefile):
         os.remove(sqlitefile)
 
     database = sqlite3.connect(sqlitefile)
     c = database.cursor()
 
-    c.execute("CREATE TABLE kanji ("
+    table_name = dbtable["kanji"]
+    c.execute("CREATE TABLE " + table_name + " ("
         "character TEXT"
         ")")
+    c.execute("CREATE INDEX " + table_name + "_character_index ON " + table_name + " (character)")
 
-    c.execute("CREATE TABLE groups ("
+    table_name = dbtable["groups"]
+    c.execute("CREATE TABLE " + table_name + " ("
         "kanji_id INTEGER,"
         "lft INTEGER,"
         "rgt INTEGER,"
@@ -67,18 +82,17 @@ def create_database(name):
         "tradForm INTEGER DEFAULT NULL,"
         "radicalForm INTEGER DEFAULT NULL"
         ")")
+    c.execute("CREATE INDEX " + table_name + "_id_index ON " + table_name + " (kanji_id)")
+    c.execute("CREATE INDEX " + table_name + "_tree_index ON " + table_name + " (lft,rgt)")
 
-    c.execute("CREATE TABLE strokes ("
+    table_name = dbtable["strokes"]
+    c.execute("CREATE TABLE " + table_name + " ("
         "group_id INTEGER,"
         "sequence INTEGER,"
         "type TEXT,"
         "path TEXT"
         ")")
-
-    c.execute("CREATE INDEX kanji_index ON kanji (character)")
-    c.execute("CREATE INDEX groups_index ON groups (kanji_id)")
-    c.execute("CREATE INDEX tree_index ON groups (lft,rgt)")
-    c.execute("CREATE INDEX strokes_index ON strokes (group_id)")
+    c.execute("CREATE INDEX " + table_name + "_id_index ON " + table_name + " (group_id)")
 
     return database
 
@@ -92,10 +106,11 @@ def parse_path(path, group_id, database):
 
     sequence = int(id[11:])
 
-    c.execute("INSERT INTO strokes (group_id, sequence, type, path) VALUES (?,?,?,?)", [group_id, sequence, type, d])
+    c.execute("INSERT INTO " + dbtable["strokes"] + " (group_id, sequence, type, path) VALUES (?,?,?,?)", [group_id, sequence, type, d])
 
 
 def parse_group(group, kanji_id, parent_lft, database):
+    table_name = dbtable["groups"]
     c = database.cursor()
 
     id = group.attrib.get("id")
@@ -115,13 +130,13 @@ def parse_group(group, kanji_id, parent_lft, database):
         sequence = int(id[11:])
 
     if parent_lft > 0:
-        c.execute("UPDATE groups SET lft = lft + 2 WHERE kanji_id = ? AND lft > ?", [kanji_id, parent_lft])
-        c.execute("UPDATE groups SET rgt = rgt + 2 WHERE kanji_id = ? AND rgt > ?", [kanji_id, parent_lft])
+        c.execute("UPDATE " + table_name + " SET lft = lft + 2 WHERE kanji_id = ? AND lft > ?", [kanji_id, parent_lft])
+        c.execute("UPDATE " + table_name + " SET rgt = rgt + 2 WHERE kanji_id = ? AND rgt > ?", [kanji_id, parent_lft])
    
     lft = parent_lft + 1
     rgt = parent_lft + 2
 
-    query = "INSERT INTO groups (kanji_id, lft, rgt, sequence"
+    query = "INSERT INTO " + table_name + " (kanji_id, lft, rgt, sequence"
     values = [kanji_id, lft, rgt, sequence]
 
     if element != None:
@@ -193,7 +208,7 @@ def parse_kanji(kanji, database):
 
     if kanji_code >= 0x4E00 and kanji_code <= 0x9FBF: # Only kanji are stored into database
         c = database.cursor()
-        c.execute("INSERT INTO kanji (character) VALUES (?)", chr(kanji_code))
+        c.execute("INSERT INTO " + dbtable["kanji"] + " (character) VALUES (?)", chr(kanji_code))
         kanji_id = c.lastrowid
     
         if len(kanji) != 1 or kanji[0].tag != "g":
@@ -224,9 +239,13 @@ def parse_kanjisv(file, database):
 
 def main():
     args = parse_cmdline()
+    appendtables = False
+
+    if args.appendtables is not None:
+        appendtables = True
 
     print("Create database...", end="\n", flush=True)
-    database = create_database(args.sqlitefile.strip())
+    database = create_database(args.sqlitefile.strip(), args.dbtableprefix.strip(), appendtables)
 
     print("Start importing KanjiVG data:", end="", flush=True)
     parse_kanjisv(args.kanjivgfile, database)
