@@ -35,7 +35,7 @@ def parse_cmdline():
     parser.add_argument("--kanjivgfile", help="path to the .xml KanjiVG file", default="kanjivg.xml")
     parser.add_argument("--sqlitefile", help="path to the sqlite database to create", required=True)
     parser.add_argument("--dbtableprefix", help="prefix of db tables (ex. kanjivg)", default="kanjivg")
-    parser.add_argument("--appendtables", help="append tables into an existing database file")
+    parser.add_argument("--appendtables", help="append tables into an existing database file", action="store_true")
     return parser.parse_args()
 
 
@@ -241,7 +241,7 @@ def main():
     args = parse_cmdline()
     appendtables = False
 
-    if args.appendtables is not None:
+    if args.appendtables:
         appendtables = True
 
     print("Create database...", end="\n", flush=True)

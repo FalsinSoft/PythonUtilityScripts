@@ -13,7 +13,7 @@ def parse_cmdline():
     parser.add_argument("--kradfile2", help="path to the kradfile2", default="kradfile2")
     parser.add_argument("--sqlitefile", help="path to the sqlite database to create", required=True)
     parser.add_argument("--dbtableprefix", help="prefix of db tables (ex. krad)", default="krad")
-    parser.add_argument("--appendtables", help="append tables into an existing database file")
+    parser.add_argument("--appendtables", help="append tables into an existing database file", action="store_true")
     return parser.parse_args()
 
 
@@ -107,7 +107,7 @@ def main():
 	# Example query for get the list kanji having specific radical
     # select data from kanji, kanji_radical where kanji.rowid = kanji_radical.kanji_id and kanji_radical.radical_id = (select rowid from radicals where data = '田')
 
-    if args.appendtables is not None:
+    if args.appendtables:
         appendtables = True
 
     kradfile = codecs.open(args.kradfile, 'r', 'euc-jp')
